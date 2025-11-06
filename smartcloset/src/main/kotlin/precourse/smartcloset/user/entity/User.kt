@@ -22,6 +22,9 @@ class User(
     @Column(name = "password", nullable = false)
     val password: String,
 
+    @Column(name = "nickname", unique = true, nullable = false)
+    val nickname: String,
+
     @Column(name = "created_at", nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now()
 )

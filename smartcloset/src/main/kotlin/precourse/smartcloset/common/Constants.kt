@@ -10,4 +10,7 @@ object Constants {
     const val PASSWORD_FORMAT_ERROR_MESSAGE = "[ERROR] 비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다."
 //    패스워드 확인
     const val PASSWORD_MISMATCH_ERROR_MESSAGE = "[ERROR] 비밀번호가 일치하지 않습니다."
+//    닉네임
+    const val NICKNAME_LENGTH_ERROR_MESSAGE = "[ERROR] 닉네임은 2자 이상 8자 이하여야 합니다."
+    const val NICKNAME_DUPLICATE_ERROR_MESSAGE = "[ERROR] 이미 존재하는 닉네임입니다."
 }
