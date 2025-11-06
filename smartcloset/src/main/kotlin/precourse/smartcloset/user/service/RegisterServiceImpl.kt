@@ -6,6 +6,7 @@ import precourse.smartcloset.common.Constants.EMAIL_FORMAT_ERROR_MESSAGE
 import precourse.smartcloset.common.Constants.NULL_ERROR_MESSAGE
 import precourse.smartcloset.common.Constants.PASSWORD_FORMAT_ERROR_MESSAGE
 import precourse.smartcloset.common.Constants.PASSWORD_LENGTH_ERROR_MESSAGE
+import precourse.smartcloset.common.Constants.PASSWORD_MISMATCH_ERROR_MESSAGE
 import precourse.smartcloset.user.entity.User
 import precourse.smartcloset.user.repository.UserRepository
 
@@ -14,10 +15,12 @@ class RegisterServiceImpl(
     private val userRepository: UserRepository
 ) : RegisterService {
 
-    override fun register(email: String, password: String): User {
+    override fun register(email: String, password: String, confirmPassword: String): User {
         validateEmail(email)
         validatePassword(password)
+        validatePaswordConfirm(password, confirmPassword)
         val user = User(email = email, password = password)
+
         return userRepository.save(user)
     }
 
@@ -74,5 +77,10 @@ class RegisterServiceImpl(
 
     private fun checkSpecial(password: String): Boolean {
         return password.any { !it.isLetterOrDigit() }
+    }
+
+    private fun validatePaswordConfirm(password: String, confirmPassword: String) {
+        validateEmpty(confirmPassword)
+        require(password == confirmPassword) { PASSWORD_MISMATCH_ERROR_MESSAGE }
     }
 }
