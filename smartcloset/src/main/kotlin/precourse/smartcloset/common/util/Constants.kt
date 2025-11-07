@@ -1,4 +1,4 @@
-package precourse.smartcloset.common
+package precourse.smartcloset.common.util
 
 object Constants {
 //    아이디
@@ -13,4 +13,7 @@ object Constants {
 //    닉네임
     const val NICKNAME_LENGTH_ERROR_MESSAGE = "[ERROR] 닉네임은 2자 이상 8자 이하여야 합니다."
     const val NICKNAME_DUPLICATE_ERROR_MESSAGE = "[ERROR] 이미 존재하는 닉네임입니다."
+//    공통예외
+    const val BAD_REQUEST_ERROR_MESSAGE = "[ERROR] 잘못된 요청입니다."
+    const val INTERNAL_SERVER_ERROR_MESSAGE = "[ERROR] 서버 오류가 발생했습니다."
 }

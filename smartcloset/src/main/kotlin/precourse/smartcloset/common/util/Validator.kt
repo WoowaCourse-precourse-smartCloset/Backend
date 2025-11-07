@@ -1,4 +1,4 @@
-package precourse.smartcloset.common
+package precourse.smartcloset.common.util
 
 import org.springframework.stereotype.Component
 import precourse.smartcloset.user.repository.UserRepository
