@@ -16,4 +16,6 @@ object Constants {
 //    공통예외
     const val BAD_REQUEST_ERROR_MESSAGE = "[ERROR] 잘못된 요청입니다."
     const val INTERNAL_SERVER_ERROR_MESSAGE = "[ERROR] 서버 오류가 발생했습니다."
+//    회원가입 성공 메시지
+    const val REGISTER_SUCCESS_MESSAGE = "회원가입이 완료되었습니다."
 }
