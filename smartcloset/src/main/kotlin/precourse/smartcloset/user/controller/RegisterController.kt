@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import precourse.smartcloset.common.dto.ApiResponse
 import precourse.smartcloset.common.util.Constants.LOGIN_REQUIRED_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Constants.REGISTER_SUCCESS_MESSAGE
+import precourse.smartcloset.common.util.Constants.WITHDRAW_SUCCESS_MESSAGE
 import precourse.smartcloset.user.dto.RegisterRequest
 import precourse.smartcloset.user.dto.RegisterResponse
 import precourse.smartcloset.user.service.RegisterService
@@ -47,5 +48,14 @@ class RegisterController(private val registerService: RegisterService) {
         registerService.withdraw(userId)
 
         session.invalidate()
+
+        val apiResponse = ApiResponse.success<Unit>(
+            message = WITHDRAW_SUCCESS_MESSAGE,
+            data = null
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(apiResponse)
     }
 }
