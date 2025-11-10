@@ -32,6 +32,14 @@ class RegisterServiceImpl(
         return RegisterResponse.from(savedUser)
     }
 
+    override fun withdraw(userId: Long) {
+        deleteUser(userId)
+    }
+
+    private fun deleteUser(userId: Long) {
+        return userRepository.deleteById(userId)
+    }
+
     private fun passwordEncode(password: String): String {
         return passwordEncoder.encode(password)
     }
