@@ -43,5 +43,7 @@ class RegisterController(private val registerService: RegisterService) {
 
         val userId = session.getAttribute("userId") as Long?
             ?: throw IllegalArgumentException(LOGIN_REQUIRED_ERROR_MESSAGE)
+
+        registerService.withdraw(userId)
     }
 }
