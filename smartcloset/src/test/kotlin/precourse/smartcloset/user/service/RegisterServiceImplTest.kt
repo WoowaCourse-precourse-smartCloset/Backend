@@ -40,7 +40,7 @@ class RegisterServiceImplTest {
         val result = registerService.register(email, rawPassword, rawPassword, nickname)
 
         // then
-        assertThat(result.id).isEqualTo(savedUser.id)
+        assertThat(result.userId).isEqualTo(savedUser.id)
         assertThat(result.email).isEqualTo(savedUser.email)
         assertThat(result.nickname).isEqualTo(savedUser.nickname)
     }
