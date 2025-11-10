@@ -14,8 +14,14 @@ class SessionAuthInterceptor : HandlerInterceptor {
         response: HttpServletResponse,
         handler: Any
     ): Boolean {
+
         val session = request.getSession(false)
             ?: throw IllegalArgumentException(LOGIN_REQUIRED_ERROR_MESSAGE)
+
+        val userId = session.getAttribute("userId") as Long?
+            ?: throw IllegalArgumentException(LOGIN_REQUIRED_ERROR_MESSAGE)
+
+        request.setAttribute("userId", userId)
 
         return true
     }
