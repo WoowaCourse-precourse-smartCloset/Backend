@@ -45,5 +45,7 @@ class RegisterController(private val registerService: RegisterService) {
             ?: throw IllegalArgumentException(LOGIN_REQUIRED_ERROR_MESSAGE)
 
         registerService.withdraw(userId)
+
+        session.invalidate()
     }
 }
