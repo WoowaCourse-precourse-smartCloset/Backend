@@ -18,4 +18,6 @@ object Constants {
     const val INTERNAL_SERVER_ERROR_MESSAGE = "[ERROR] 서버 오류가 발생했습니다."
 //    회원가입 성공 메시지
     const val REGISTER_SUCCESS_MESSAGE = "회원가입이 완료되었습니다."
+//    로그인
+const val EMAIL_NOT_EXIST_ERROR_MESSAGE = "[ERROR] 존재하지 않는 아이디입니다."
 }

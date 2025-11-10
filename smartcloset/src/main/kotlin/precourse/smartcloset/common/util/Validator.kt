@@ -1,13 +1,14 @@
 package precourse.smartcloset.common.util
 
 import org.springframework.stereotype.Component
+import precourse.smartcloset.common.util.Constants.EMAIL_NOT_EXIST_ERROR_MESSAGE
 import precourse.smartcloset.user.repository.UserRepository
 
 @Component
 class Validator(private val userRepository: UserRepository) {
 
-//    이메일
-    fun validateEmail(email: String) {
+//    이메일 ( 회원가입 )
+    fun validateRegisterEmail(email: String) {
 //        빈 문자열 입력 예외 처리
         validateEmpty(email)
 //        이메일 형식이 아닌 경우 예외 처리
@@ -42,6 +43,16 @@ class Validator(private val userRepository: UserRepository) {
         validateNicknameLength(nickname)
 //        닉네임 중복 체크 (이미 존재하는 경우 예외 처리)
         validateDuplicateNickname(nickname)
+    }
+
+    //    이메일 예외 ( 로그인 )
+    fun validateLoginEmail(email: String) {
+        validateEmpty(email)
+        validateExistEmail(email)
+    }
+
+    private fun validateExistEmail(email: String) {
+        require(userRepository.existsByEmail(email)) { EMAIL_NOT_EXIST_ERROR_MESSAGE }
     }
 
     private fun validateDuplicateEmail(email: String) {

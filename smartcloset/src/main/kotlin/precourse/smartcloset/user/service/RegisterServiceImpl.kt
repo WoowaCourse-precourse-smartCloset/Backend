@@ -16,7 +16,7 @@ class RegisterServiceImpl(
 
     override fun register(email: String, password: String, confirmPassword: String, nickname: String): RegisterResponse {
 //        이메일 검증
-        validator.validateEmail(email)
+        validator.validateRegisterEmail(email)
 //        비밀번호 검증
         validator.validatePassword(password)
 //        비밀번호 확인

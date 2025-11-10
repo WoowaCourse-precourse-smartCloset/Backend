@@ -9,7 +9,7 @@ class LoginServiceImpl(
     private val validator: Validator
 ): LoginService {
     override fun login(email: String, password: String): LoginResponse {
-        validator.validateEmail(email)
+        validator.validateLoginEmail(email)
         validator.validatePassword(password)
     }
 }
