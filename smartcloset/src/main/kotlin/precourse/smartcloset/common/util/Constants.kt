@@ -21,4 +21,5 @@ object Constants {
 //    로그인
     const val EMAIL_NOT_EXIST_ERROR_MESSAGE = "[ERROR] 존재하지 않는 아이디입니다."
     const val LOGIN_SUCCESS_MESSAGE = "로그인에 성공하였습니다."
+    const val LOGOUT_SUCCESS_MESSAGE = "로그아웃에 성공하엿습니다."
 }

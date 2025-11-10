@@ -40,5 +40,14 @@ class LoginController(private val loginService: LoginService) {
     @PostMapping("/logout")
     fun logout(session: HttpSession): ResponseEntity<ApiResponse<Unit>> {
         session.invalidate()
+
+        val apiResponse = ApiResponse.success<Unit>(
+            message = LOGOUT_SUCCESS_MESSAGE,
+            data = null
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(apiResponse)
     }
 }
