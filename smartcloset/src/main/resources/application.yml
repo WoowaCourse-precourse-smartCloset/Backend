@@ -12,3 +12,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  servlet:
+    session:
+      timeout: 1h
+      cookie:
+        http-only: true
+        secure: false
+        same-site: lax
