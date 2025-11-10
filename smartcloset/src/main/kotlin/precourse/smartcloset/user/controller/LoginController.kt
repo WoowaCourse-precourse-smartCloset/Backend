@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import precourse.smartcloset.common.dto.ApiResponse
 import precourse.smartcloset.common.util.Constants.LOGIN_SUCCESS_MESSAGE
+import precourse.smartcloset.common.util.Constants.LOGOUT_SUCCESS_MESSAGE
 import precourse.smartcloset.user.dto.LoginRequest
 import precourse.smartcloset.user.dto.LoginResponse
 import precourse.smartcloset.user.service.LoginService
@@ -34,5 +35,10 @@ class LoginController(private val loginService: LoginService) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(apiResponse)
+    }
+
+    @PostMapping("/logout")
+    fun logout(session: HttpSession): ResponseEntity<ApiResponse<Unit>> {
+        session.invalidate()
     }
 }
