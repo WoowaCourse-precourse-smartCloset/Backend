@@ -24,7 +24,7 @@ class LoginServiceImpl(
     }
 
     private fun validateLoginPassword(input: String, password: String) {
-        require(passwordEncoder.matches(password, input)) {
+        require(passwordEncoder.matches(input, password)) {
             PASSWORD_MISMATCH_ERROR_MESSAGE
         }
     }
