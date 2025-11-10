@@ -18,7 +18,7 @@ class RegisterServiceImpl(
 //        이메일 검증
         validator.validateRegisterEmail(email)
 //        비밀번호 검증
-        validator.validatePassword(password)
+        validator.validateRegisterPassword(password)
 //        비밀번호 확인
         validator.validatePaswordConfirm(password, confirmPassword)
 //        닉네임 검증

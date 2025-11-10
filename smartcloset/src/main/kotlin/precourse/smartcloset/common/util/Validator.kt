@@ -18,7 +18,7 @@ class Validator(private val userRepository: UserRepository) {
     }
 
 //    비밀번호
-    fun validatePassword(password: String) {
+    fun validateRegisterPassword(password: String) {
 //        빈 문자열 입력 예외 처리
         validateEmpty(password)
 //        8자 미만, 12자 초과인 경우 예외 처리
@@ -64,7 +64,7 @@ class Validator(private val userRepository: UserRepository) {
         require(emailRegex.matches(email)) { Constants.EMAIL_FORMAT_ERROR_MESSAGE }
     }
 
-    private fun validateEmpty(input: String) {
+    fun validateEmpty(input: String) {
         require(input.isNotEmpty()) { Constants.NULL_ERROR_MESSAGE }
     }
 
@@ -103,4 +103,6 @@ class Validator(private val userRepository: UserRepository) {
     private fun validateDuplicateNickname(nickname: String) {
         require(!userRepository.existsByNickname(nickname)) { Constants.NICKNAME_DUPLICATE_ERROR_MESSAGE }
     }
+
+
 }
