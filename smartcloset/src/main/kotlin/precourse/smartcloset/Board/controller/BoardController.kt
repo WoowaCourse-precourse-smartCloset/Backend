@@ -3,15 +3,19 @@ package precourse.smartcloset.Board.controller
 import jakarta.servlet.http.HttpSession
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import precourse.smartcloset.Board.dto.BoardListResponse
 import precourse.smartcloset.Board.dto.BoardRequest
 import precourse.smartcloset.Board.dto.BoardResponse
 import precourse.smartcloset.Board.service.BoardService
 import precourse.smartcloset.common.dto.ApiResponse
 import precourse.smartcloset.common.util.Constants.BOARD_CREATE_SUCCESS_MESSAGE
+import precourse.smartcloset.common.util.Constants.BOARD_GET_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.SessionUtil
 
 @RestController
@@ -34,6 +38,24 @@ class BoardController(private val boardService: BoardService) {
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
+            .body(apiResponse)
+    }
+
+    @GetMapping
+    fun getBoardList(
+        @RequestParam(required = false) lastId: Long?,
+        @RequestParam(defaultValue = "10") size: Int
+    ): ResponseEntity<ApiResponse<BoardListResponse>> {
+
+        val response = boardService.getBoardList(lastId, size)
+
+        val apiResponse = ApiResponse.success(
+            message = BOARD_GET_SUCCESS_MESSAGE,
+            data = response
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
             .body(apiResponse)
     }
 }

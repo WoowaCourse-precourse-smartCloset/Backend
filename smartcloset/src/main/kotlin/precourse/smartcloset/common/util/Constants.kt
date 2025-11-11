@@ -30,6 +30,7 @@ object Constants {
     const val BOARD_TAGS_SIZE_ERROR_MESSAGE = "[ERROR] 태그는 최대 3개까지 등록할 수 있습니다."
     const val BOARD_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 게시글을 찾을 수 없습니다."
     const val BOARD_CREATE_SUCCESS_MESSAGE = "게시글이 작성되었습니다."
+    const val BOARD_GET_SUCCESS_MESSAGE = "게시글 목록을 조회하였습니다."
     const val BOARD_UNAUTHORIZED_ERROR_MESSAGE = "[ERROR] 게시글을 수정/삭제할 권한이 없습니다."
     const val USER_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 존재하지 않는 유저입니다."
     const val SESSION_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 세션 시간이 종료되었습니다. 다시 로그인 해주세요."

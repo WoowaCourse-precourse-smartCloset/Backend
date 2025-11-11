@@ -1,6 +1,9 @@
 package precourse.smartcloset.Board.service
 
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import precourse.smartcloset.Board.dto.BoardListResponse
 import precourse.smartcloset.Board.dto.BoardRequest
 import precourse.smartcloset.Board.dto.BoardResponse
 import precourse.smartcloset.Board.entity.Board
@@ -26,12 +29,23 @@ class BoardServiceImpl(
 //        작성자 조회
         val user = findUserById(userId)
 //        쉼표로 구분된 문자열로 변환
-        val tagsString = buildTagsString(request.tags)
+        val tagsString = convertTagsToString(request.tags)
 //        게시글 생성
         val board = createBoardEntity(request, user, tagsString)
 //        게시글 저장
-        val savedBoard = saveBoard(board)
+        val savedBoard = boardRepository.save(board)
         return BoardResponse.from(savedBoard)
+    }
+
+    @Transactional(readOnly = true)
+    override fun getBoardList(lastId: Long?, size: Int): BoardListResponse {
+        val boards = fetchBoards(lastId, size)
+        val hasNext = hasNextPage(boards, size)
+        val boardList = extractBoardList(boards, hasNext)
+        val boardResponses = convertToBoardResponses(boardList)
+        val nextLastId = calculateNextLastId(boardList, hasNext)
+
+        return createBoardListResponse(boardResponses, hasNext, nextLastId)
     }
 
     private fun findUserById(userId: Long): User {
@@ -39,8 +53,8 @@ class BoardServiceImpl(
             .orElseThrow { IllegalArgumentException(USER_NOT_FOUND_ERROR_MESSAGE) }
     }
 
-    private fun saveBoard(board: Board): Board {
-        return boardRepository.save(board)
+    private fun convertTagsToString(tags: List<String>?): String? {
+        return tags?.joinToString(",")
     }
 
     private fun createBoardEntity(request: BoardRequest, user: User, tagsString: String?): Board {
@@ -54,11 +68,40 @@ class BoardServiceImpl(
         )
     }
 
-    private fun buildTagsString(tags: List<String>?): String? {
-        if (tags.isNullOrEmpty()) {
-            return null
-        }
-        val tagsString = tags.joinToString(",")
-        return tagsString
+    private fun fetchBoards(lastId: Long?, size: Int): List<Board> {
+        val pageable = PageRequest.of(0, size + 1)
+        if (lastId == null) return boardRepository.findAllWithUser(pageable)
+        return boardRepository.findByIdLessThanWithUser(lastId, pageable)
+    }
+
+    private fun hasNextPage(boards: List<Board>, size: Int): Boolean {
+        return boards.size > size
+    }
+
+    private fun extractBoardList(boards: List<Board>, hasNext: Boolean): List<Board> {
+        if (hasNext) return boards.dropLast(1)
+        return boards
+    }
+
+    private fun convertToBoardResponses(boards: List<Board>): List<BoardResponse> {
+        return boards.map { BoardResponse.from(it) }
+    }
+
+    private fun calculateNextLastId(boards: List<Board>, hasNext: Boolean): Long? {
+        if (!hasNext) return null
+        if (boards.isEmpty()) return null
+        return boards.last().id
+    }
+
+    private fun createBoardListResponse(
+        boards: List<BoardResponse>,
+        hasNext: Boolean,
+        nextLastId: Long?
+    ): BoardListResponse {
+        return BoardListResponse(
+            boards = boards,
+            hasNext = hasNext,
+            nextLastId = nextLastId
+        )
     }
 }
