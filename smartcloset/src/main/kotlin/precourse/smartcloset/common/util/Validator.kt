@@ -51,6 +51,25 @@ class Validator(private val userRepository: UserRepository) {
         validateExistEmail(email)
     }
 
+    //    게시글 제목
+    fun validateBoardTitle(title: String) {
+        validateEmpty(title)
+        require(title.length <= 20) { Constants.BOARD_TITLE_LENGTH_ERROR_MESSAGE }
+    }
+
+    //    게시글 내용
+    fun validateBoardContent(content: String) {
+        validateEmpty(content)
+        require(content.length <= 100) { Constants.BOARD_CONTENT_LENGTH_ERROR_MESSAGE }
+    }
+
+    //    게시글 태그
+    fun validateBoardTags(tags: List<String>?) {
+        if (tags != null) {
+            require(tags.size <= 3) { Constants.BOARD_TAGS_SIZE_ERROR_MESSAGE }
+        }
+    }
+
     private fun validateExistEmail(email: String) {
         require(userRepository.existsByEmail(email)) { EMAIL_NOT_EXIST_ERROR_MESSAGE }
     }

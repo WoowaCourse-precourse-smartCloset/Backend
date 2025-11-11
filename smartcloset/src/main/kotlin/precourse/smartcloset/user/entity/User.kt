@@ -1,11 +1,14 @@
 package precourse.smartcloset.user.entity
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
+import precourse.smartcloset.Board.entity.Board
 import java.time.LocalDateTime
 
 @Entity
@@ -25,6 +28,6 @@ class User(
     @Column(name = "nickname", unique = true, nullable = false)
     val nickname: String,
 
-    @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val boards: MutableList<Board> = mutableListOf()
 )

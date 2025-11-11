@@ -24,4 +24,13 @@ object Constants {
     const val LOGIN_SUCCESS_MESSAGE = "로그인에 성공하였습니다."
     const val LOGOUT_SUCCESS_MESSAGE = "로그아웃에 성공하엿습니다."
     const val WITHDRAW_SUCCESS_MESSAGE = "회원탈퇴에 성공하였습니다. 이용해주셔서 감사합니다."
+    // 게시글
+    const val BOARD_TITLE_LENGTH_ERROR_MESSAGE = "[ERROR] 제목은 20자 이하여야 합니다."
+    const val BOARD_CONTENT_LENGTH_ERROR_MESSAGE = "[ERROR] 내용은 100자 이하여야 합니다."
+    const val BOARD_TAGS_SIZE_ERROR_MESSAGE = "[ERROR] 태그는 최대 3개까지 등록할 수 있습니다."
+    const val BOARD_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 게시글을 찾을 수 없습니다."
+    const val BOARD_CREATE_SUCCESS_MESSAGE = "게시글이 작성되었습니다."
+    const val BOARD_UNAUTHORIZED_ERROR_MESSAGE = "[ERROR] 게시글을 수정/삭제할 권한이 없습니다."
+    const val USER_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 존재하지 않는 유저입니다."
+    const val SESSION_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 세션 시간이 종료되었습니다. 다시 로그인 해주세요."
 }
