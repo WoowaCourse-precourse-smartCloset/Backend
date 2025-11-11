@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -13,10 +14,12 @@ import org.springframework.web.bind.annotation.RestController
 import precourse.smartcloset.Board.dto.BoardListResponse
 import precourse.smartcloset.Board.dto.BoardRequest
 import precourse.smartcloset.Board.dto.BoardResponse
+import precourse.smartcloset.Board.dto.BoardUpdateRequest
 import precourse.smartcloset.Board.service.BoardService
 import precourse.smartcloset.common.dto.ApiResponse
 import precourse.smartcloset.common.util.Constants.BOARD_CREATE_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.Constants.BOARD_GET_SUCCESS_MESSAGE
+import precourse.smartcloset.common.util.Constants.BOARD_UPDATE_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.SessionUtil
 
 @RestController
@@ -68,6 +71,25 @@ class BoardController(private val boardService: BoardService) {
 
         val apiResponse = ApiResponse.success(
             message = BOARD_GET_SUCCESS_MESSAGE,
+            data = response
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(apiResponse)
+    }
+
+    @PutMapping("/{boardId}")
+    fun updateBoard(
+        @PathVariable boardId: Long,
+        @RequestBody request: BoardUpdateRequest,
+        session: HttpSession
+    ): ResponseEntity<ApiResponse<BoardResponse>> {
+        val userId = SessionUtil.getUserId(session)
+        val response = boardService.updateBoard(userId, boardId, request)
+
+        val apiResponse = ApiResponse.success(
+            message = BOARD_UPDATE_SUCCESS_MESSAGE,
             data = response
         )
 

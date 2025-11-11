@@ -5,7 +5,8 @@ import precourse.smartcloset.common.util.Constants.EMAIL_NOT_EXIST_ERROR_MESSAGE
 import precourse.smartcloset.user.repository.UserRepository
 
 @Component
-class Validator(private val userRepository: UserRepository) {
+class Validator(
+    private val userRepository: UserRepository) {
 
 //    이메일 ( 회원가입 )
     fun validateRegisterEmail(email: String) {

@@ -34,4 +34,5 @@ object Constants {
     const val BOARD_UNAUTHORIZED_ERROR_MESSAGE = "[ERROR] 게시글을 수정/삭제할 권한이 없습니다."
     const val USER_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 존재하지 않는 유저입니다."
     const val SESSION_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 세션 시간이 종료되었습니다. 다시 로그인 해주세요."
+    const val BOARD_UPDATE_SUCCESS_MESSAGE = "게시글이 수정되었습니다."
 }

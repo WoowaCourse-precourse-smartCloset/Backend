@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service
 import precourse.smartcloset.Board.dto.BoardListResponse
 import precourse.smartcloset.Board.dto.BoardRequest
 import precourse.smartcloset.Board.dto.BoardResponse
+import precourse.smartcloset.Board.dto.BoardUpdateRequest
 import precourse.smartcloset.Board.entity.Board
 import precourse.smartcloset.Board.repository.BoardRepository
 import precourse.smartcloset.common.util.Constants.BOARD_NOT_FOUND_ERROR_MESSAGE
+import precourse.smartcloset.common.util.Constants.BOARD_UNAUTHORIZED_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Constants.USER_NOT_FOUND_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Validator
 import precourse.smartcloset.user.entity.User
@@ -56,10 +58,23 @@ class BoardServiceImpl(
         return BoardResponse.from(board)
     }
 
+    override fun updateBoard(userId: Long, boardId: Long, request: BoardUpdateRequest): BoardResponse {
+        validator.validateBoardTitle(request.title)
+        validator.validateBoardContent(request.content)
+        validator.validateBoardTags(request.tags)
+
+        val board = findBoardById(boardId)
+        validateBoardOwner(board, userId)
+
+        val tagsString = convertTagsToString(request.tags)
+        updateBoardEntity(board, request, tagsString)
+
+        return BoardResponse.from(board)
+    }
+
     private fun findBoardById(boardId: Long) =
         boardRepository.findByIdOrNull(boardId)
             ?: throw IllegalArgumentException(BOARD_NOT_FOUND_ERROR_MESSAGE)
-
 
     private fun findUserById(userId: Long): User {
         return userRepository.findById(userId)
@@ -115,6 +130,20 @@ class BoardServiceImpl(
             boards = boards,
             hasNext = hasNext,
             nextLastId = nextLastId
+        )
+    }
+
+    private fun validateBoardOwner(board: Board, userId: Long) {
+        require(board.user.id != userId) { BOARD_UNAUTHORIZED_ERROR_MESSAGE }
+    }
+
+    private fun updateBoardEntity(board: Board, request: BoardUpdateRequest, tagsString: String?) {
+        board.update(
+            title = request.title,
+            content = request.content,
+            weather = request.weather,
+            imageUrl = request.imageUrl,
+            tags = tagsString
         )
     }
 }
