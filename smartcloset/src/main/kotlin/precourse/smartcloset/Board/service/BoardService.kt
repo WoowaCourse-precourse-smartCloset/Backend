@@ -10,4 +10,5 @@ interface BoardService {
     fun getBoardList(lastId: Long?, size: Int): BoardListResponse
     fun getBoardById(boardId: Long): BoardResponse
     fun updateBoard(userId: Long, boardId: Long, request: BoardUpdateRequest): BoardResponse
+    fun deleteBoard(userId: Long, boardId: Long)
 }

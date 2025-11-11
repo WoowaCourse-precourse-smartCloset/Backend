@@ -3,6 +3,7 @@ package precourse.smartcloset.Board.controller
 import jakarta.servlet.http.HttpSession
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -18,6 +19,7 @@ import precourse.smartcloset.Board.dto.BoardUpdateRequest
 import precourse.smartcloset.Board.service.BoardService
 import precourse.smartcloset.common.dto.ApiResponse
 import precourse.smartcloset.common.util.Constants.BOARD_CREATE_SUCCESS_MESSAGE
+import precourse.smartcloset.common.util.Constants.BOARD_DELETE_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.Constants.BOARD_GET_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.Constants.BOARD_UPDATE_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.SessionUtil
@@ -91,6 +93,24 @@ class BoardController(private val boardService: BoardService) {
         val apiResponse = ApiResponse.success(
             message = BOARD_UPDATE_SUCCESS_MESSAGE,
             data = response
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(apiResponse)
+    }
+
+    @DeleteMapping("/{boardId}")
+    fun deleteBoard(
+        @PathVariable boardId: Long,
+        session: HttpSession
+    ): ResponseEntity<ApiResponse<Unit>> {
+        val userId = SessionUtil.getUserId(session)
+        boardService.deleteBoard(userId, boardId)
+
+        val apiResponse = ApiResponse.success<Unit>(
+            message = BOARD_DELETE_SUCCESS_MESSAGE,
+            data = null
         )
 
         return ResponseEntity

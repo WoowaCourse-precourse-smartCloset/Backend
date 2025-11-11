@@ -72,6 +72,13 @@ class BoardServiceImpl(
         return BoardResponse.from(board)
     }
 
+    @Transactional
+    override fun deleteBoard(userId: Long, boardId: Long) {
+        val board = findBoardById(boardId)
+        validateBoardOwner(board, userId)
+        boardRepository.delete(board)
+    }
+
     private fun findBoardById(boardId: Long) =
         boardRepository.findByIdOrNull(boardId)
             ?: throw IllegalArgumentException(BOARD_NOT_FOUND_ERROR_MESSAGE)
