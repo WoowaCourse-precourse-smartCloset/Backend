@@ -141,7 +141,7 @@ class BoardServiceImpl(
     }
 
     private fun validateBoardOwner(board: Board, userId: Long) {
-        require(board.user.id != userId) { BOARD_UNAUTHORIZED_ERROR_MESSAGE }
+        require(board.user.id == userId) { BOARD_UNAUTHORIZED_ERROR_MESSAGE }
     }
 
     private fun updateBoardEntity(board: Board, request: BoardUpdateRequest, tagsString: String?) {
