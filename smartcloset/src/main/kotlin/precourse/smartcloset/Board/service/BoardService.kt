@@ -7,4 +7,5 @@ import precourse.smartcloset.Board.dto.BoardResponse
 interface BoardService {
     fun createBoard(userId: Long, request: BoardRequest): BoardResponse
     fun getBoardList(lastId: Long?, size: Int): BoardListResponse
+    fun getBoardById(boardId: Long): BoardResponse
 }

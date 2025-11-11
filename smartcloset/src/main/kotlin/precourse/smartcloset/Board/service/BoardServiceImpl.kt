@@ -2,12 +2,14 @@ package precourse.smartcloset.Board.service
 
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import precourse.smartcloset.Board.dto.BoardListResponse
 import precourse.smartcloset.Board.dto.BoardRequest
 import precourse.smartcloset.Board.dto.BoardResponse
 import precourse.smartcloset.Board.entity.Board
 import precourse.smartcloset.Board.repository.BoardRepository
+import precourse.smartcloset.common.util.Constants.BOARD_NOT_FOUND_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Constants.USER_NOT_FOUND_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Validator
 import precourse.smartcloset.user.entity.User
@@ -47,6 +49,17 @@ class BoardServiceImpl(
 
         return createBoardListResponse(boardResponses, hasNext, nextLastId)
     }
+
+    @Transactional(readOnly = true)
+    override fun getBoardById(boardId: Long): BoardResponse {
+        val board = findBoardById(boardId)
+        return BoardResponse.from(board)
+    }
+
+    private fun findBoardById(boardId: Long) =
+        boardRepository.findByIdOrNull(boardId)
+            ?: throw IllegalArgumentException(BOARD_NOT_FOUND_ERROR_MESSAGE)
+
 
     private fun findUserById(userId: Long): User {
         return userRepository.findById(userId)

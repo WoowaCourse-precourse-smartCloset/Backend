@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -48,6 +49,22 @@ class BoardController(private val boardService: BoardService) {
     ): ResponseEntity<ApiResponse<BoardListResponse>> {
 
         val response = boardService.getBoardList(lastId, size)
+
+        val apiResponse = ApiResponse.success(
+            message = BOARD_GET_SUCCESS_MESSAGE,
+            data = response
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(apiResponse)
+    }
+
+    @GetMapping("/{boardId}")
+    fun getBoardById(
+        @PathVariable boardId: Long
+    ): ResponseEntity<ApiResponse<BoardResponse>> {
+        val response = boardService.getBoardById(boardId)
 
         val apiResponse = ApiResponse.success(
             message = BOARD_GET_SUCCESS_MESSAGE,
