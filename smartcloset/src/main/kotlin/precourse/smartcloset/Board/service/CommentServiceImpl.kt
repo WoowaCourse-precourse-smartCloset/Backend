@@ -55,6 +55,13 @@ class CommentServiceImpl(
         return CommentResponse.from(comment)
     }
 
+    @Transactional
+    override fun deleteComment(userId: Long, commentId: Long) {
+        val comment = findCommentById(commentId)
+        validateCommentOwner(comment, userId)
+        commentRepository.delete(comment)
+    }
+
     private fun findUserById(userId: Long): User {
         return userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException(USER_NOT_FOUND_ERROR_MESSAGE) }
