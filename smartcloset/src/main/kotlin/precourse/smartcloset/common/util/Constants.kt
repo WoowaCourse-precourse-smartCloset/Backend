@@ -36,4 +36,11 @@ object Constants {
     const val SESSION_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 세션 시간이 종료되었습니다. 다시 로그인 해주세요."
     const val BOARD_UPDATE_SUCCESS_MESSAGE = "게시글이 수정되었습니다."
     const val BOARD_DELETE_SUCCESS_MESSAGE = "게시글이 삭제되었습니다."
+    // 댓글 관련
+    const val COMMENT_CONTENT_LENGTH_ERROR_MESSAGE = "[ERROR] 댓글 내용은 100자 이하여야 합니다."
+    const val COMMENT_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 댓글을 찾을 수 없습니다."
+    const val COMMENT_CREATE_SUCCESS_MESSAGE = "댓글이 작성되었습니다."
+    const val COMMENT_UPDATE_SUCCESS_MESSAGE = "댓글이 수정되었습니다."
+    const val COMMENT_DELETE_SUCCESS_MESSAGE = "댓글이 삭제되었습니다."
+    const val COMMENT_UNAUTHORIZED_ERROR_MESSAGE = "[ERROR] 댓글을 수정/삭제할 권한이 없습니다."
 }

@@ -1,0 +1,55 @@
+package precourse.smartcloset.Board.service
+
+import jakarta.transaction.Transactional
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Service
+import precourse.smartcloset.Board.dto.CommentRequest
+import precourse.smartcloset.Board.dto.CommentResponse
+import precourse.smartcloset.Board.entity.Board
+import precourse.smartcloset.Board.entity.Comment
+import precourse.smartcloset.Board.repository.BoardRepository
+import precourse.smartcloset.Board.repository.CommentRepository
+import precourse.smartcloset.common.util.Constants.BOARD_NOT_FOUND_ERROR_MESSAGE
+import precourse.smartcloset.common.util.Constants.USER_NOT_FOUND_ERROR_MESSAGE
+import precourse.smartcloset.common.util.Validator
+import precourse.smartcloset.user.entity.User
+import precourse.smartcloset.user.repository.UserRepository
+
+@Service
+class CommentServiceImpl(
+    private val commentRepository: CommentRepository,
+    private val boardRepository: BoardRepository,
+    private val userRepository: UserRepository,
+    private val validator: Validator
+) : CommentService {
+
+    @Transactional
+    override fun createComment(userId: Long, boardId: Long, request: CommentRequest): CommentResponse {
+        validator.validateCommentContent(request.content)
+
+        val user = findUserById(userId)
+        val board = findBoardById(boardId)
+        val comment = createCommentEntity(request, board, user)
+        val savedComment = commentRepository.save(comment)
+
+        return CommentResponse.from(savedComment)
+    }
+
+    private fun findUserById(userId: Long): User {
+        return userRepository.findById(userId)
+            .orElseThrow { IllegalArgumentException(USER_NOT_FOUND_ERROR_MESSAGE) }
+    }
+
+    private fun findBoardById(boardId: Long): Board {
+        return boardRepository.findByIdOrNull(boardId)
+            ?: throw IllegalArgumentException(BOARD_NOT_FOUND_ERROR_MESSAGE)
+    }
+
+    private fun createCommentEntity(request: CommentRequest, board: Board, user: User): Comment {
+        return Comment(
+            content = request.content,
+            board = board,
+            user = user
+        )
+    }
+}

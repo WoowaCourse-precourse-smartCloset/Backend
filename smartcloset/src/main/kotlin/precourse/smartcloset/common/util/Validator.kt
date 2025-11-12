@@ -1,6 +1,7 @@
 package precourse.smartcloset.common.util
 
 import org.springframework.stereotype.Component
+import precourse.smartcloset.common.util.Constants.COMMENT_CONTENT_LENGTH_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Constants.EMAIL_NOT_EXIST_ERROR_MESSAGE
 import precourse.smartcloset.user.repository.UserRepository
 
@@ -69,6 +70,12 @@ class Validator(
         if (tags != null) {
             require(tags.size <= 3) { Constants.BOARD_TAGS_SIZE_ERROR_MESSAGE }
         }
+    }
+
+    //    댓글 내용 검증
+    fun validateCommentContent(content: String) {
+        validateEmpty(content)
+        require(content.length <= 100) { COMMENT_CONTENT_LENGTH_ERROR_MESSAGE }
     }
 
     private fun validateExistEmail(email: String) {
