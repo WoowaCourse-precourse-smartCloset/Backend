@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -15,6 +16,7 @@ import precourse.smartcloset.Board.service.CommentService
 import precourse.smartcloset.common.dto.ApiResponse
 import precourse.smartcloset.common.util.Constants.COMMENT_CREATE_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.Constants.COMMENT_GET_SUCCESS_MESSAGE
+import precourse.smartcloset.common.util.Constants.COMMENT_UPDATE_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.SessionUtil
 
 @RestController
@@ -56,4 +58,23 @@ class CommentController(private val commentService: CommentService) {
             .body(apiResponse)
     }
 
+    @PutMapping("/{commentId}")
+    fun updateComment(
+        @PathVariable boardId: Long,
+        @PathVariable commentId: Long,
+        @RequestBody request: CommentRequest,
+        session: HttpSession
+    ): ResponseEntity<ApiResponse<CommentResponse>> {
+        val userId = SessionUtil.getUserId(session)
+        val response = commentService.updateComment(userId, commentId, request)
+
+        val apiResponse = ApiResponse.success(
+            message = COMMENT_UPDATE_SUCCESS_MESSAGE,
+            data = response
+        )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(apiResponse)
+    }
 }

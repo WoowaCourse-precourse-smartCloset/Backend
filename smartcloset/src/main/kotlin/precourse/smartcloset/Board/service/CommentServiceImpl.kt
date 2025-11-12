@@ -10,6 +10,8 @@ import precourse.smartcloset.Board.entity.Comment
 import precourse.smartcloset.Board.repository.BoardRepository
 import precourse.smartcloset.Board.repository.CommentRepository
 import precourse.smartcloset.common.util.Constants.BOARD_NOT_FOUND_ERROR_MESSAGE
+import precourse.smartcloset.common.util.Constants.COMMENT_NOT_FOUND_ERROR_MESSAGE
+import precourse.smartcloset.common.util.Constants.COMMENT_UNAUTHORIZED_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Constants.USER_NOT_FOUND_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Validator
 import precourse.smartcloset.user.entity.User
@@ -42,6 +44,17 @@ class CommentServiceImpl(
         return convertToCommentResponses(comments)
     }
 
+    @Transactional
+    override fun updateComment(userId: Long, commentId: Long, request: CommentRequest): CommentResponse {
+        validator.validateCommentContent(request.content)
+
+        val comment = findCommentById(commentId)
+        validateCommentOwner(comment, userId)
+        updateCommentEntity(comment, request)
+
+        return CommentResponse.from(comment)
+    }
+
     private fun findUserById(userId: Long): User {
         return userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException(USER_NOT_FOUND_ERROR_MESSAGE) }
@@ -50,6 +63,11 @@ class CommentServiceImpl(
     private fun findBoardById(boardId: Long): Board {
         return boardRepository.findByIdOrNull(boardId)
             ?: throw IllegalArgumentException(BOARD_NOT_FOUND_ERROR_MESSAGE)
+    }
+
+    private fun findCommentById(commentId: Long): Comment {
+        return commentRepository.findByIdOrNull(commentId)
+            ?: throw IllegalArgumentException(COMMENT_NOT_FOUND_ERROR_MESSAGE)
     }
 
     private fun createCommentEntity(request: CommentRequest, board: Board, user: User): Comment {
@@ -66,7 +84,15 @@ class CommentServiceImpl(
         }
     }
 
+    private fun validateCommentOwner(comment: Comment, userId: Long) {
+        require(comment.user.id == userId) { COMMENT_UNAUTHORIZED_ERROR_MESSAGE }
+    }
+
     private fun convertToCommentResponses(comments: List<Comment>): List<CommentResponse> {
         return comments.map { CommentResponse.from(it) }
+    }
+
+    private fun updateCommentEntity(comment: Comment, request: CommentRequest) {
+        comment.update(request.content)
     }
 }
