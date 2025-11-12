@@ -42,5 +42,6 @@ object Constants {
     const val COMMENT_CREATE_SUCCESS_MESSAGE = "댓글이 작성되었습니다."
     const val COMMENT_UPDATE_SUCCESS_MESSAGE = "댓글이 수정되었습니다."
     const val COMMENT_DELETE_SUCCESS_MESSAGE = "댓글이 삭제되었습니다."
+    const val COMMENT_GET_SUCCESS_MESSAGE = "댓글 목록을 조회하였습니다."
     const val COMMENT_UNAUTHORIZED_ERROR_MESSAGE = "[ERROR] 댓글을 수정/삭제할 권한이 없습니다."
 }

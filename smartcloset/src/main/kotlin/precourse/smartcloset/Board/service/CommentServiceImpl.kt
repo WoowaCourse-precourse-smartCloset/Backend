@@ -1,6 +1,6 @@
 package precourse.smartcloset.Board.service
 
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import precourse.smartcloset.Board.dto.CommentRequest
@@ -35,6 +35,13 @@ class CommentServiceImpl(
         return CommentResponse.from(savedComment)
     }
 
+    @Transactional(readOnly = true)
+    override fun getCommentsByBoardId(boardId: Long): List<CommentResponse> {
+        validateBoardExists(boardId)
+        val comments = commentRepository.findByBoardIdWithUser(boardId)
+        return convertToCommentResponses(comments)
+    }
+
     private fun findUserById(userId: Long): User {
         return userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException(USER_NOT_FOUND_ERROR_MESSAGE) }
@@ -51,5 +58,15 @@ class CommentServiceImpl(
             board = board,
             user = user
         )
+    }
+
+    private fun validateBoardExists(boardId: Long) {
+        if (!boardRepository.existsById(boardId)) {
+            throw IllegalArgumentException(BOARD_NOT_FOUND_ERROR_MESSAGE)
+        }
+    }
+
+    private fun convertToCommentResponses(comments: List<Comment>): List<CommentResponse> {
+        return comments.map { CommentResponse.from(it) }
     }
 }
