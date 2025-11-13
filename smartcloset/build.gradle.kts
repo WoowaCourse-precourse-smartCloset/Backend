@@ -41,6 +41,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.529")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 }
 
 kotlin {

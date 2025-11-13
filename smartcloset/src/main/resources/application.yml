@@ -16,7 +16,7 @@ spring:
 cloud:
   aws:
     credentials:
-      access-key: ${AWS_ACCESS_KEY}      
+      access-key: ${AWS_ACCESS_KEY}
       secret-key: ${AWS_SECRET_KEY}
     region:
       static: ap-northeast-2
@@ -33,3 +33,10 @@ server:
         http-only: true
         secure: false
         same-site: lax
+
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+    model: gpt-4o-mini
+    max-tokens: 500
+    temperature: 0.7

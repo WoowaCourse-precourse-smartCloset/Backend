@@ -58,4 +58,10 @@ object Constants {
     // S3 관련
     const val S3_UPLOAD_FAILED_ERROR_MESSAGE = "[ERROR] S3 업로드에 실패했습니다."
     const val S3_DELETE_FAILED_ERROR_MESSAGE = "[ERROR] S3 파일 삭제에 실패했습니다."
+    // OpenAI 관련
+    const val OPENAI_API_CALL_FAILED_ERROR_MESSAGE = "[ERROR] OpenAI API 호출에 실패했습니다."
+    const val RECOMMENDATION_SUCCESS_MESSAGE = "옷차림 추천이 완료되었습니다."
+
+    // 추천 관련
+    const val INVALID_TEMPERATURE_ERROR_MESSAGE = "[ERROR] 온도는 -50도에서 50도 사이여야 합니다."
 }
