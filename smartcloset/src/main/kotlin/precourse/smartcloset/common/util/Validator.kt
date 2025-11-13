@@ -1,6 +1,10 @@
 package precourse.smartcloset.common.util
 
 import org.springframework.stereotype.Component
+import precourse.smartcloset.common.util.Constants.BOARD_CONTENT_LENGTH_ERROR_MESSAGE
+import precourse.smartcloset.common.util.Constants.BOARD_TAGS_COUNT_ERROR_MESSAGE
+import precourse.smartcloset.common.util.Constants.BOARD_TAG_LENGTH_ERROR_MESSAGE
+import precourse.smartcloset.common.util.Constants.BOARD_TITLE_LENGTH_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Constants.COMMENT_CONTENT_LENGTH_ERROR_MESSAGE
 import precourse.smartcloset.common.util.Constants.EMAIL_NOT_EXIST_ERROR_MESSAGE
 import precourse.smartcloset.user.repository.UserRepository
@@ -53,22 +57,23 @@ class Validator(
         validateExistEmail(email)
     }
 
-    //    게시글 제목
     fun validateBoardTitle(title: String) {
         validateEmpty(title)
-        require(title.length <= 20) { Constants.BOARD_TITLE_LENGTH_ERROR_MESSAGE }
+        require(title.length <= 20) { BOARD_TITLE_LENGTH_ERROR_MESSAGE }
     }
 
-    //    게시글 내용
+    // 게시글 내용 검증
     fun validateBoardContent(content: String) {
         validateEmpty(content)
-        require(content.length <= 100) { Constants.BOARD_CONTENT_LENGTH_ERROR_MESSAGE }
+        require(content.length <= 100) { BOARD_CONTENT_LENGTH_ERROR_MESSAGE }
     }
 
-    //    게시글 태그
+    // 게시글 태그 검증
     fun validateBoardTags(tags: List<String>?) {
-        if (tags != null) {
-            require(tags.size <= 3) { Constants.BOARD_TAGS_SIZE_ERROR_MESSAGE }
+        if (tags == null) return
+        require(tags.size <= 3) { BOARD_TAGS_COUNT_ERROR_MESSAGE }
+        tags.forEach { tag ->
+            require(tag.length <= 10) { BOARD_TAG_LENGTH_ERROR_MESSAGE }
         }
     }
 
@@ -130,6 +135,4 @@ class Validator(
     private fun validateDuplicateNickname(nickname: String) {
         require(!userRepository.existsByNickname(nickname)) { Constants.NICKNAME_DUPLICATE_ERROR_MESSAGE }
     }
-
-
 }

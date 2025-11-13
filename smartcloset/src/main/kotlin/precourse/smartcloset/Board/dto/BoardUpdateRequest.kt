@@ -6,6 +6,5 @@ data class BoardUpdateRequest(
     val title: String,
     val content: String,
     val weather: WeatherType,
-    val imageUrl: String? = null,
-    val tags: List<String>? = null
+    val tags: String?
 )

@@ -3,14 +3,7 @@ package precourse.smartcloset.Board.controller
 import jakarta.servlet.http.HttpSession
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import precourse.smartcloset.Board.dto.CommentRequest
 import precourse.smartcloset.Board.dto.CommentResponse
 import precourse.smartcloset.Board.service.CommentService
@@ -21,6 +14,7 @@ import precourse.smartcloset.common.util.Constants.COMMENT_GET_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.Constants.COMMENT_UPDATE_SUCCESS_MESSAGE
 import precourse.smartcloset.common.util.SessionUtil
 
+@CrossOrigin(origins = ["http://localhost:3000"], allowCredentials = "true")
 @RestController
 @RequestMapping("/api/v1/boards/{boardId}/comments")
 class CommentController(private val commentService: CommentService) {
@@ -34,14 +28,7 @@ class CommentController(private val commentService: CommentService) {
         val userId = SessionUtil.getUserId(session)
         val response = commentService.createComment(userId, boardId, request)
 
-        val apiResponse = ApiResponse.success(
-            message = COMMENT_CREATE_SUCCESS_MESSAGE,
-            data = response
-        )
-
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(apiResponse)
+        return createSuccessResponse(response, COMMENT_CREATE_SUCCESS_MESSAGE, HttpStatus.CREATED)
     }
 
     @GetMapping
@@ -49,15 +36,7 @@ class CommentController(private val commentService: CommentService) {
         @PathVariable boardId: Long
     ): ResponseEntity<ApiResponse<List<CommentResponse>>> {
         val response = commentService.getCommentsByBoardId(boardId)
-
-        val apiResponse = ApiResponse.success(
-            message = COMMENT_GET_SUCCESS_MESSAGE,
-            data = response
-        )
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(apiResponse)
+        return createSuccessResponse(response, COMMENT_GET_SUCCESS_MESSAGE, HttpStatus.OK)
     }
 
     @PutMapping("/{commentId}")
@@ -70,14 +49,7 @@ class CommentController(private val commentService: CommentService) {
         val userId = SessionUtil.getUserId(session)
         val response = commentService.updateComment(userId, commentId, request)
 
-        val apiResponse = ApiResponse.success(
-            message = COMMENT_UPDATE_SUCCESS_MESSAGE,
-            data = response
-        )
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(apiResponse)
+        return createSuccessResponse(response, COMMENT_UPDATE_SUCCESS_MESSAGE, HttpStatus.OK)
     }
 
     @DeleteMapping("/{commentId}")
@@ -89,13 +61,15 @@ class CommentController(private val commentService: CommentService) {
         val userId = SessionUtil.getUserId(session)
         commentService.deleteComment(userId, commentId)
 
-        val apiResponse = ApiResponse.success<Unit>(
-            message = COMMENT_DELETE_SUCCESS_MESSAGE,
-            data = null
-        )
+        return createSuccessResponse(null, COMMENT_DELETE_SUCCESS_MESSAGE, HttpStatus.OK)
+    }
 
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(apiResponse)
+    private fun <T> createSuccessResponse(
+        data: T?,
+        message: String,
+        status: HttpStatus
+    ): ResponseEntity<ApiResponse<T>> {
+        val apiResponse = ApiResponse.success(message = message, data = data)
+        return ResponseEntity.status(status).body(apiResponse)
     }
 }

@@ -1,9 +1,10 @@
 package precourse.smartcloset.Board.service
 
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import precourse.smartcloset.Board.dto.BoardListResponse
 import precourse.smartcloset.Board.dto.BoardRequest
 import precourse.smartcloset.Board.dto.BoardResponse
@@ -21,23 +22,26 @@ import precourse.smartcloset.user.repository.UserRepository
 class BoardServiceImpl(
     private val boardRepository: BoardRepository,
     private val userRepository: UserRepository,
+    private val s3FileStorageService: S3FileStorageService,
     private val validator: Validator
 ) : BoardService {
-    override fun createBoard(userId: Long, request: BoardRequest): BoardResponse {
-//        제목 20자 이하
+
+    @Transactional
+    override fun createBoard(userId: Long, request: BoardRequest, imageFile: MultipartFile?): BoardResponse {
+        // 유효성 검사
         validator.validateBoardTitle(request.title)
-//        내용 100자 이하
         validator.validateBoardContent(request.content)
-//        태그 선택, 최대 3개
-        validator.validateBoardTags(request.tags)
-//        작성자 조회
+        // tags를 String으로 받아서 검증
+        val tagsList = convertTagsStringToList(request.tags)
+        validator.validateBoardTags(tagsList)
+        // 사용자 조회
         val user = findUserById(userId)
-//        쉼표로 구분된 문자열로 변환
-        val tagsString = convertTagsToString(request.tags)
-//        게시글 생성
-        val board = createBoardEntity(request, user, tagsString)
-//        게시글 저장
+        // 이미지 업로드 (선택사항)
+        val imageUrl = uploadImage(imageFile)
+        // 게시글 생성
+        val board = createBoardEntity(request, user, imageUrl)
         val savedBoard = boardRepository.save(board)
+
         return BoardResponse.from(savedBoard)
     }
 
@@ -58,16 +62,24 @@ class BoardServiceImpl(
         return BoardResponse.from(board)
     }
 
-    override fun updateBoard(userId: Long, boardId: Long, request: BoardUpdateRequest): BoardResponse {
+    @Transactional
+    override fun updateBoard(
+        userId: Long,
+        boardId: Long,
+        request: BoardUpdateRequest,
+        imageFile: MultipartFile?
+    ): BoardResponse {
         validator.validateBoardTitle(request.title)
         validator.validateBoardContent(request.content)
-        validator.validateBoardTags(request.tags)
+
+        val tagsList = convertTagsStringToList(request.tags)
+        validator.validateBoardTags(tagsList)
 
         val board = findBoardById(boardId)
         validateBoardOwner(board, userId)
 
-        val tagsString = convertTagsToString(request.tags)
-        updateBoardEntity(board, request, tagsString)
+        val newImageUrl = updateImageIfProvided(board.imageUrl, imageFile)
+        updateBoardEntity(board, request, newImageUrl)
 
         return BoardResponse.from(board)
     }
@@ -76,29 +88,41 @@ class BoardServiceImpl(
     override fun deleteBoard(userId: Long, boardId: Long) {
         val board = findBoardById(boardId)
         validateBoardOwner(board, userId)
+
+        board.imageUrl?.let { s3FileStorageService.deleteImage(it) }
+
         boardRepository.delete(board)
     }
 
-    private fun findBoardById(boardId: Long) =
-        boardRepository.findByIdOrNull(boardId)
+    private fun findBoardById(boardId: Long): Board {
+        return boardRepository.findByIdOrNull(boardId)
             ?: throw IllegalArgumentException(BOARD_NOT_FOUND_ERROR_MESSAGE)
+    }
 
     private fun findUserById(userId: Long): User {
         return userRepository.findById(userId)
             .orElseThrow { IllegalArgumentException(USER_NOT_FOUND_ERROR_MESSAGE) }
     }
 
-    private fun convertTagsToString(tags: List<String>?): String? {
-        return tags?.joinToString(",")
+    private fun convertTagsStringToList(tagsString: String?): List<String>? {
+        if (tagsString.isNullOrBlank()) return null
+        return tagsString.split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
     }
 
-    private fun createBoardEntity(request: BoardRequest, user: User, tagsString: String?): Board {
+    private fun uploadImage(imageFile: MultipartFile?): String? {
+        if (imageFile == null || imageFile.isEmpty) return null
+        return s3FileStorageService.saveImage(imageFile)
+    }
+
+    private fun createBoardEntity(request: BoardRequest, user: User, imageUrl: String?): Board {
         return Board(
             title = request.title,
             content = request.content,
             weather = request.weather,
-            imageUrl = request.imageUrl,
-            tags = tagsString,
+            imageUrl = imageUrl,
+            tags = request.tags,
             user = user
         )
     }
@@ -144,13 +168,34 @@ class BoardServiceImpl(
         require(board.user.id == userId) { BOARD_UNAUTHORIZED_ERROR_MESSAGE }
     }
 
-    private fun updateBoardEntity(board: Board, request: BoardUpdateRequest, tagsString: String?) {
+    private fun updateBoardEntity(board: Board, request: BoardUpdateRequest, imageUrl: String?) {
         board.update(
             title = request.title,
             content = request.content,
             weather = request.weather,
-            imageUrl = request.imageUrl,
-            tags = tagsString
+            imageUrl = imageUrl,
+            tags = request.tags
         )
+    }
+
+    private fun updateImageIfProvided(currentImageUrl: String?, imageFile: MultipartFile?): String? {
+        if (shouldNotUpdateImage(imageFile)) {
+            return currentImageUrl
+        }
+
+        deleteCurrentImage(currentImageUrl)
+        return uploadNewImage(imageFile!!)
+    }
+
+    private fun shouldNotUpdateImage(imageFile: MultipartFile?): Boolean {
+        return imageFile == null || imageFile.isEmpty
+    }
+
+    private fun deleteCurrentImage(imageUrl: String?) {
+        imageUrl?.let { s3FileStorageService.deleteImage(it) }
+    }
+
+    private fun uploadNewImage(imageFile: MultipartFile): String? {
+        return uploadImage(imageFile)
     }
 }

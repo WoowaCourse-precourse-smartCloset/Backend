@@ -36,6 +36,9 @@ object Constants {
     const val SESSION_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 세션 시간이 종료되었습니다. 다시 로그인 해주세요."
     const val BOARD_UPDATE_SUCCESS_MESSAGE = "게시글이 수정되었습니다."
     const val BOARD_DELETE_SUCCESS_MESSAGE = "게시글이 삭제되었습니다."
+
+    const val BOARD_TAGS_COUNT_ERROR_MESSAGE = "[ERROR] 태그는 최대 3개까지 입력 가능합니다."
+    const val BOARD_TAG_LENGTH_ERROR_MESSAGE = "[ERROR] 태그는 10자 이하여야 합니다."
     // 댓글 관련
     const val COMMENT_CONTENT_LENGTH_ERROR_MESSAGE = "[ERROR] 댓글 내용은 100자 이하여야 합니다."
     const val COMMENT_NOT_FOUND_ERROR_MESSAGE = "[ERROR] 댓글을 찾을 수 없습니다."
@@ -44,4 +47,15 @@ object Constants {
     const val COMMENT_DELETE_SUCCESS_MESSAGE = "댓글이 삭제되었습니다."
     const val COMMENT_GET_SUCCESS_MESSAGE = "댓글 목록을 조회하였습니다."
     const val COMMENT_UNAUTHORIZED_ERROR_MESSAGE = "[ERROR] 댓글을 수정/삭제할 권한이 없습니다."
+    // 날씨 타입
+    const val INVALID_WEATHER_TYPE_ERROR_MESSAGE = "[ERROR] 잘못된 날씨 타입입니다. (SUNNY, CLOUDY, RAINY, SNOWY, WINDY)"
+
+    // 파일 관련
+    const val FILE_EMPTY_ERROR_MESSAGE = "[ERROR] 파일이 비어있습니다."
+    const val IMAGE_FORMAT_ERROR_MESSAGE = "[ERROR] 지원하지 않는 이미지 형식입니다. (jpeg, jpg, png, gif, webp만 가능)"
+    const val FILE_SIZE_EXCEED_ERROR_MESSAGE = "[ERROR] 파일 크기는 10MB를 초과할 수 없습니다."
+
+    // S3 관련
+    const val S3_UPLOAD_FAILED_ERROR_MESSAGE = "[ERROR] S3 업로드에 실패했습니다."
+    const val S3_DELETE_FAILED_ERROR_MESSAGE = "[ERROR] S3 파일 삭제에 실패했습니다."
 }
