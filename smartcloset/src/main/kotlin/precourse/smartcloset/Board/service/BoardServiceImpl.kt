@@ -94,6 +94,17 @@ class BoardServiceImpl(
         boardRepository.delete(board)
     }
 
+    @Transactional(readOnly = true)
+    override fun getMyBoards(userId: Long, lastId: Long?, size: Int): BoardListResponse {
+        val boards = fetchMyBoards(userId, lastId, size)
+        val hasNext = hasNextPage(boards, size)
+        val boardList = extractBoardList(boards, hasNext)
+        val boardResponses = convertToBoardResponses(boardList)
+        val nextLastId = calculateNextLastId(boardList, hasNext)
+
+        return createBoardListResponse(boardResponses, hasNext, nextLastId)
+    }
+
     private fun findBoardById(boardId: Long): Board {
         return boardRepository.findByIdOrNull(boardId)
             ?: throw IllegalArgumentException(BOARD_NOT_FOUND_ERROR_MESSAGE)
@@ -131,6 +142,12 @@ class BoardServiceImpl(
         val pageable = PageRequest.of(0, size + 1)
         if (lastId == null) return boardRepository.findAllWithUser(pageable)
         return boardRepository.findByIdLessThanWithUser(lastId, pageable)
+    }
+
+    private fun fetchMyBoards(userId: Long, lastId: Long?, size: Int): List<Board> {
+        val pageable = PageRequest.of(0, size + 1)
+        if (lastId == null) return boardRepository.findByUserIdWithUser(userId, pageable)
+        return boardRepository.findByUserIdAndIdLessThanWithUser(userId, lastId, pageable)
     }
 
     private fun hasNextPage(boards: List<Board>, size: Int): Boolean {

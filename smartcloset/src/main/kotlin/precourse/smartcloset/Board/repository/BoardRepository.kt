@@ -14,4 +14,14 @@ interface BoardRepository : JpaRepository<Board, Long> {
 
     @Query("SELECT b FROM Board b JOIN FETCH b.user WHERE b.id < :lastId ORDER BY b.id DESC")
     fun findByIdLessThanWithUser(@Param("lastId") lastId: Long, pageable: Pageable): List<Board>
+
+    @Query("SELECT b FROM Board b JOIN FETCH b.user WHERE b.user.id = :userId ORDER BY b.id DESC")
+    fun findByUserIdWithUser(@Param("userId") userId: Long, pageable: Pageable): List<Board>
+
+    @Query("SELECT b FROM Board b JOIN FETCH b.user WHERE b.user.id = :userId AND b.id < :lastId ORDER BY b.id DESC")
+    fun findByUserIdAndIdLessThanWithUser(
+        @Param("userId") userId: Long,
+        @Param("lastId") lastId: Long,
+        pageable: Pageable
+    ): List<Board>
 }

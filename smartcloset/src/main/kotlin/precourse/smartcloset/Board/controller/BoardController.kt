@@ -56,6 +56,17 @@ class BoardController(private val boardService: BoardService) {
         return createSuccessResponse(response, BOARD_GET_SUCCESS_MESSAGE, HttpStatus.OK)
     }
 
+    @GetMapping("/my")
+    fun getMyBoards(
+        @RequestParam(required = false) lastId: Long?,
+        @RequestParam(defaultValue = "10") size: Int,
+        session: HttpSession
+    ): ResponseEntity<ApiResponse<BoardListResponse>> {
+        val userId = SessionUtil.getUserId(session)
+        val response = boardService.getMyBoards(userId, lastId, size)
+        return createSuccessResponse(response, BOARD_GET_SUCCESS_MESSAGE, HttpStatus.OK)
+    }
+
     @PutMapping("/{boardId}")
     fun updateBoard(
         @PathVariable boardId: Long,
