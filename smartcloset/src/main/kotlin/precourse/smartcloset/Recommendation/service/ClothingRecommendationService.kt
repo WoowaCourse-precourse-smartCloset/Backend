@@ -1,5 +1,6 @@
 package precourse.smartcloset.Recommendation.service
 
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import precourse.smartcloset.Board.entity.WeatherType
@@ -14,7 +15,13 @@ class ClothingRecommendationService(
 ) {
 
     @Transactional(readOnly = true)
+    @Cacheable(
+        value = ["clothingRecommendations"],
+        keyGenerator = "recommendationKeyGenerator",
+        unless = "#result == null"
+    )
     fun getRecommendation(request: RecommendationRequest): RecommendationResponse {
+
         validator.validate(request)
 
         val prompt = createPrompt(request)
