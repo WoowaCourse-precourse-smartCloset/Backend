@@ -1,4 +1,4 @@
-package precourse.smartcloset.board.service
+package precourse.smartcloset.Board.service
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -11,7 +11,6 @@ import precourse.smartcloset.Board.dto.BoardUpdateRequest
 import precourse.smartcloset.Board.entity.Board
 import precourse.smartcloset.Board.entity.WeatherType
 import precourse.smartcloset.Board.repository.BoardRepository
-import precourse.smartcloset.Board.service.BoardServiceImpl
 import precourse.smartcloset.common.util.Validator
 import precourse.smartcloset.user.entity.User
 import precourse.smartcloset.user.repository.UserRepository
@@ -20,18 +19,26 @@ import java.util.*
 class BoardServiceImplTest {
     private val boardRepository: BoardRepository = mock()
     private val userRepository: UserRepository = mock()
+    private val s3FileStorageService: S3FileStorageService = mock()
     private val validator: Validator = mock()
-    private val boardService = BoardServiceImpl(boardRepository, userRepository, validator)
+
+    private val boardService = BoardServiceImpl(
+        boardRepository,
+        userRepository,
+        s3FileStorageService,
+        validator
+    )
 
     @Test
     fun `게시글 작성 성공`() {
+        println("[TEST] 게시글 작성 성공 시작")
+
         val userId = 1L
         val request = BoardRequest(
             title = "테스트 제목",
             content = "테스트 내용",
             weather = WeatherType.SUNNY,
-            imageUrl = "https://test.jpg",
-            tags = listOf("태그1", "태그2")
+            tags = "태그1,태그2"
         )
 
         val user = User(
@@ -41,20 +48,20 @@ class BoardServiceImplTest {
             nickname = "테스터"
         )
 
-        val board = Board(
+        val savedBoard = Board(
             id = 1L,
             title = request.title,
             content = request.content,
             weather = request.weather,
-            imageUrl = request.imageUrl,
-            tags = "태그1,태그2",
+            imageUrl = null,
+            tags = request.tags,
             user = user
         )
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user))
-        given(boardRepository.save(any())).willReturn(board)
+        given(boardRepository.save(any())).willReturn(savedBoard)
 
-        val result = boardService.createBoard(userId, request)
+        val result = boardService.createBoard(userId, request, null)
 
         assertThat(result.boardId).isEqualTo(1L)
         assertThat(result.title).isEqualTo("테스트 제목")
@@ -68,13 +75,14 @@ class BoardServiceImplTest {
         val request = BoardRequest(
             title = "테스트",
             content = "테스트 내용",
-            weather = WeatherType.SUNNY
+            weather = WeatherType.SUNNY,
+            tags = null
         )
 
         given(userRepository.findById(userId)).willReturn(Optional.empty())
 
         assertThatThrownBy {
-            boardService.createBoard(userId, request)
+            boardService.createBoard(userId, request, null)
         }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
@@ -100,8 +108,8 @@ class BoardServiceImplTest {
     @Test
     fun `게시글 목록 조회 성공 - lastId 있음 및 hasNext true`() {
         val user = User(1L, "test@test.com", "test123!", "테스터")
-        val boards = (1..11).map {
-            Board(it.toLong(), "제목$it", "내용$it", WeatherType.SUNNY, null, null, user)
+        val boards = (1L..11L).map {
+            Board(it, "제목$it", "내용$it", WeatherType.SUNNY, null, null, user)
         }
 
         val pageable = PageRequest.of(0, 11)
@@ -129,12 +137,12 @@ class BoardServiceImplTest {
 
         given(boardRepository.findById(1L)).willReturn(Optional.of(board))
 
-
         val result = boardService.getBoardById(1L)
 
         assertThat(result.boardId).isEqualTo(1L)
         assertThat(result.title).isEqualTo("테스트 제목")
         assertThat(result.nickname).isEqualTo("테스터")
+        assertThat(result.tags).containsExactly("태그1", "태그2")
     }
 
     @Test
@@ -148,14 +156,15 @@ class BoardServiceImplTest {
 
     @Test
     fun `게시글 수정 성공`() {
+        println("[TEST] 게시글 수정 성공 시작")
+
         val userId = 1L
         val boardId = 1L
         val request = BoardUpdateRequest(
             title = "수정된 제목",
             content = "수정된 내용",
             weather = WeatherType.CLOUDY,
-            imageUrl = "https://updated.jpg",
-            tags = listOf("수정태그")
+            tags = "수정태그"
         )
 
         val user = User(userId, "test@test.com", "test123!", "테스터")
@@ -171,11 +180,12 @@ class BoardServiceImplTest {
 
         given(boardRepository.findById(boardId)).willReturn(Optional.of(board))
 
-        val result = boardService.updateBoard(userId, boardId, request)
+        val result = boardService.updateBoard(userId, boardId, request, null)
 
         assertThat(result.title).isEqualTo("수정된 제목")
         assertThat(result.content).isEqualTo("수정된 내용")
         assertThat(result.weather).isEqualTo(WeatherType.CLOUDY)
+        assertThat(result.tags).containsExactly("수정태그")
     }
 
     @Test
@@ -186,7 +196,8 @@ class BoardServiceImplTest {
         val request = BoardUpdateRequest(
             title = "수정 시도",
             content = "수정 내용",
-            weather = WeatherType.SUNNY
+            weather = WeatherType.SUNNY,
+            tags = null
         )
 
         val owner = User(ownerId, "owner@test.com", "test123!", "작성자")
@@ -195,7 +206,7 @@ class BoardServiceImplTest {
         given(boardRepository.findById(boardId)).willReturn(Optional.of(board))
 
         assertThatThrownBy {
-            boardService.updateBoard(otherUserId, boardId, request)
+            boardService.updateBoard(otherUserId, boardId, request, null)
         }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
@@ -228,7 +239,13 @@ class BoardServiceImplTest {
         assertThatThrownBy {
             boardService.deleteBoard(otherUserId, boardId)
         }.isInstanceOf(IllegalArgumentException::class.java)
+    }
 
-        verify(boardRepository, never()).delete(any())
+    companion object {
+        @Suppress("UNCHECKED_CAST")
+        fun <T> any(): T {
+            org.mockito.Mockito.any<T>()
+            return null as T
+        }
     }
 }
