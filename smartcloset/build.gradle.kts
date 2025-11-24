@@ -40,6 +40,15 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.529")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    // Redis Cache
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+
+    // Redis 직렬화를 위한 Jackson
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 }
 
 kotlin {
